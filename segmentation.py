@@ -34,7 +34,11 @@ def main(args):
         dataset_params['data_location'] = args.data_location    
     dataloader_params = parameters['dataloader_params']
     if dataset_params['dataset_location'] == 'CsawS':
-        DataSet = CsawSet            
+        DataSet = CsawSet
+    elif dataset_params['dataset_location'] == 'Cityscapes':
+        DataSet = CityScapes
+    elif dataset_params['dataset_location'] == 'VOC':
+        DataSet = PascalVOC                 
     else:
         raise ImportError("Dataset not found")
         
