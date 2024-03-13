@@ -36,7 +36,26 @@ def preprocess_segmentation_samples():
                     scan_id = scan.split("_")[0]            # 099
             
                     img = cv2.imread(curr_path + file_, 0)
+                    orig_shape = img.shape
+                    img = imutils.resize(img, height=img_size)
+                    new_shape = img.shape  
+
+                    # HDF5 file, store processed images along with labels, original shape, and new shape
+                    f = h5py.File(patient_save_path + scan_id + "_" + str(orig_shape[0]) + "_" + str(orig_shape[1]) +
+                                  "_" + str(new_shape[0]) + "_" + str(new_shape[1]) + ".h5", "w")
+
+                    if clahe:
+                        clahe_create = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+                        img = clahe_create.apply(img)
                     
+                    if img.shape[1] < img.shape[0]:
+                        tmp = np.zeros((img_size, img_size), dtype=np.uint8)
+                        img_shapes = img.shape
+                        tmp[:img_shapes[0], :img_shapes[1]] = img
+                        img = tmp
+
+                    f.create_dataset(class_.strip("_"), data=img, compression="gzip", compression_opts=4)
+                    f.close()
 
                 
 def main():
