@@ -1,9 +1,9 @@
 import numpy as np
 import os
-import tensorflow as tf
-from tensorflow.keras.layers.experimental import preprocessing
-import tensorflow_addons as tfa
-from utils import *
+# import tensorflow as tf
+# from tensorflow.keras.layers.experimental import preprocessing
+# import tensorflow_addons as tfa
+# from utils import *
 import h5py
 import cv2
 import imutils
@@ -15,7 +15,7 @@ def preprocess_segmentation_samples():
     data_path = "/home/vishc1/hoang/CSAW-S/CsawS/anonymized_dataset"
     save_path = "/home/vishc1/hoang/CSAW-S/CSAWS_preprocessed"
 
-        os.makedirs(save_path)
+    os.makedirs(save_path)
 
     classes = ["_pectoral_muscle", "_nipple"]
 
@@ -28,12 +28,15 @@ def preprocess_segmentation_samples():
         if not os.path.exists(patient_save_path):
             os.makedirs(patient_save_path)
 
+        print(curr_path)
+        
         for class_ in classes:
+            print(class_)
             for file_ in os.listdir(curr_path):
+                # print(file_)
                 scan = file_.split(class_)[0]
                 scan_id = scan.split("_")[0]
-                print(scan)
-                print(scan_id)
-                break
+                # print(scan)
+                # print(scan_id)
+                
 
-    
