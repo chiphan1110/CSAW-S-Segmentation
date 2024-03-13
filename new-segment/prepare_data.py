@@ -40,3 +40,8 @@ def preprocess_segmentation_samples():
                 # print(scan_id)
                 
 
+def main():
+    preprocess_segmentation_samples()
+
+if __name__ == "__main__":
+    main()
