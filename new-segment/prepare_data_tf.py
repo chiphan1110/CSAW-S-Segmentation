@@ -20,11 +20,12 @@ def ensure_dir(path):
         os.makedirs(path)
 
 def apply_clahe(img):
-    """Apply CLAHE to image."""
+    """Apply CLAHE to an image."""
     clahe_create = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
     return clahe_create.apply(img)
 
 def preprocess_image(file_path, img_size, clahe_flag):
+    """Preprocess a single image."""
     img = cv2.imread(file_path, 0)
     if img is None:
         logging.error(f"Error reading file {file_path}. Skipping...")
@@ -36,7 +37,6 @@ def preprocess_image(file_path, img_size, clahe_flag):
     if clahe_flag:
         img = apply_clahe(img)
     
-    # Normalize image
     img = minmaxscale(img.astype(np.float32), scale_=1).astype(np.uint8)
 
     # Ensure image is square
@@ -48,6 +48,7 @@ def preprocess_image(file_path, img_size, clahe_flag):
     return img, orig_shape, img.shape
 
 def preprocess_segmentation_samples(data_path, save_path, classes, img_size, clahe_flag):
+    """Preprocess segmentation samples."""
     ensure_dir(save_path)
     
     for patient in tqdm(os.listdir(data_path), desc="Processing Patients"):
