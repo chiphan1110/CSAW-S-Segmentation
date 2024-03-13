@@ -3,7 +3,7 @@ import os
 import tensorflow as tf
 from tensorflow.keras.layers.experimental import preprocessing
 import tensorflow_addons as tfa
-from utils import *
+# from utils import *
 import h5py
 import cv2
 import imutils
@@ -36,4 +36,9 @@ def preprocess_segmentation_samples():
                 print(scan_id)
                 break
 
-    
+
+def main():
+    preprocess_segmentation_samples()
+
+if __name__ == "__main__":
+    main()
