@@ -7,3 +7,11 @@ def minmaxscale(tmp, scale_=1):
 		tmp *= scale_
 		tmp *= 255
 	return tmp
+
+def flatten_(tmp):
+	out = []
+	for t in tmp:
+		for t2 in t:
+			out.append(t2)
+	out = np.array(out)
+	return out
