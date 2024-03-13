@@ -27,8 +27,42 @@ def load_dataset(args):
     return train_loader, val_loader
 
 
-def training(args, train_dataset, val_dataset, criterion, optimizer, model, device):
+def training(args, train_loader, valid_loader, criterion, optimizer, model, device):
+    train_epoch = smp.utils.train.TrainEpoch(
+        model, 
+        loss=loss, 
+        metrics=metrics, 
+        optimizer=optimizer,
+        device=DEVICE,
+        verbose=True,
+    )
 
+    valid_epoch = smp.utils.train.ValidEpoch(
+        model, 
+        loss=loss, 
+        metrics=metrics, 
+        device=DEVICE,
+        verbose=True,
+    )
+
+
+    max_score = 0
+
+    for i in range(0, 40):
+        
+        print('\nEpoch: {}'.format(i))
+        train_logs = train_epoch.run(train_loader)
+        valid_logs = valid_epoch.run(valid_loader)
+        
+        # do something (save model, change lr, etc.)
+        if max_score < valid_logs['iou_score']:
+            max_score = valid_logs['iou_score']
+            torch.save(model, './best_model.pth')
+            print('Model saved!')
+            
+        if i == 25:
+            optimizer.param_groups[0]['lr'] = 1e-5
+            print('Decrease decoder learning rate to 1e-5!')
 
 def main():
     args = parse_args()
@@ -81,7 +115,7 @@ def main():
     # Define the optimizer and loss function
     optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
     criterion = nn.CrossEntropyLoss()  # Adjust based on your loss function
-
+    metrics = [smp.utils.metrics.IoU(threshold=0.5),]
     num_epochs = N_EPOCHS  # Set the number of epochs
 
     for epoch in range(num_epochs):
