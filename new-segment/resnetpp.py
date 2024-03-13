@@ -166,13 +166,6 @@ class ResUnetPlusPlus:
         for i in range(1, len(self.convolutions)-1):
         	cc.append(resnet_block(cc[-1], n_filters[i], strides=2))
 
-        '''
-        c2 = resnet_block(c1, n_filters[1], strides=2)
-        c3 = resnet_block(c2, n_filters[2], strides=2)
-        c4 = resnet_block(c3, n_filters[3], strides=2)
-        c5 = resnet_block(c4, n_filters[4], strides=2)
-        '''
-
         ## Bridge
         b1 = aspp_block(cc[-1], n_filters[-1])
         #b1 = aspp_block(c5, n_filters[5])
@@ -182,30 +175,6 @@ class ResUnetPlusPlus:
         for i in range(len(self.convolutions)-2, 0, -1):
         	dd.append(decoder_block(cc[i-1], dd[-1], n_filters[i]))
         
-        '''
-        d1 = decoder_block(c4, b1, n_filters[4])
-        d2 = decoder_block(c3, d1, n_filters[3])
-        d3 = decoder_block(c2, d2, n_filters[2])
-        d4 = decoder_block(c1, d3, n_filters[1])
-        '''
-
-        '''
-        d1 = attention_block(c3, b1)
-        d1 = UpSampling2D((2, 2))(d1)
-        d1 = Concatenate()([d1, c3])
-        d1 = resnet_block(d1, n_filters[3])
-
-        d2 = attention_block(c2, d1)
-        d2 = UpSampling2D((2, 2))(d2)
-        d2 = Concatenate()([d2, c2])
-        d2 = resnet_block(d2, n_filters[2])
-
-        d3 = attention_block(c1, d2)
-        d3 = UpSampling2D((2, 2))(d3)
-        d3 = Concatenate()([d3, c1])
-        d3 = resnet_block(d3, n_filters[1])
-        '''
-
         ## output
         outputs = aspp_block(dd[-1], n_filters[0])
         outputs = Conv2D(self.nb_classes, (1, 1), padding="same")(outputs)
