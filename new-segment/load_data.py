@@ -35,12 +35,13 @@ class CSAWS(Dataset):
             image = self.transform(image)
             masks = {label: self.transform(masks[label]) for label in self.label_list}
         
-
+        
         return image, masks
 
 
 if __name__ == "__main__":
     # Example usage
+    # label_list = ['nipple', 'pectoral_muscle']
     label_list = ['nipple', 'pectoral_muscle']
     transforms = transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
     dataset = CSAWS('/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/CSAWS_preprocessed', label_list, transform=transforms)
