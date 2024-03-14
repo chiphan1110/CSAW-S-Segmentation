@@ -29,7 +29,7 @@ TRANSFORM = transforms.Compose([
 
 # Dataset Params
 CLASSES = ["pectoral_muscle", "nipple"]
-NB_CLASSES = len*(CLASSES)
+NB_CLASSES = len(CLASSES)
 VAL_FRACTION = 0.8
 
 # Training Params
