@@ -76,6 +76,7 @@ def prepare_train_data():
             else:
                 logging.info(f"Mask not found: {mask_path}")
 
+
 def prepare_test_data():
     args = parse_args()
     create_dir(args.processed_test_img_path)
@@ -86,7 +87,7 @@ def prepare_test_data():
         img_name = f"{patient_id}_{img_id}"
         img_path = os.path.join(args.original_test_img_path, patient_id, f"{img_name}.png")
 
-        original_test_img = cv2.imread(img_path, cv2.IMREAD_GRAYSCALE)
+        original_test_img = preprocess_image(img_path, args.img_size, args.clahe)
     
         if original_test_img is not None:
             cv2.imwrite(os.path.join(args.processed_test_img_path, f"{img_name}.png"), (original_test_img*255).astype(np.uint8))
@@ -102,6 +103,7 @@ def prepare_test_data():
                     cv2.imwrite(os.path.join(save_test_mask_class, f"{img_name}_{class_}.png"), (mask * 255).astype(np.uint8))
             else:
                 logging.info(f"Mask not found: {mask_path}")
+
 
 if __name__ == "__main__":
     prepare_train_data()

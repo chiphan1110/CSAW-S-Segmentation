@@ -19,6 +19,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description="Train model for image segmentation")
     parser.add_argument("--dataset_dir", type=str, default=SAVE_TRAIN_PATH, help="Path to the dataset directory")
     parser.add_argument("--label_list", type=list, default=CLASSES, help="List of labels")
+    parser.add_argument("--single_label", type=str, default=SINGLE_LABEL, help="Single label")
     parser.add_argument("--transform", type=transforms.Compose, default=TRANSFORM, help="Data augmentation")
     parser.add_argument("--val_fraction", type=float, default=VAL_FRACTION, help="Fraction of the dataset to use for validation")
     
@@ -44,97 +45,26 @@ def parse_args():
 def initialize_training_env(args):
     create_dir(args.model_dir)
     create_dir(args.log_dir)
-    current_time = datetime.now().strftime("%Y_%m_%d-%H_%M%_S")
+    current_time = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
     log_file = os.path.join(args.log_dir, f"log_{current_time}.txt")
     return log_file
 
 
 def load_dataset(args):
-    full_dataset = CSAWS(args.dataset_dir, args.label_list, args.transform)
+    full_dataset = CSAWS(args.dataset_dir, args.label_list, args.single_label, args.transform)
     train_dataset, val_dataset = train_test_split(full_dataset, test_size=args.val_fraction, random_state=42)
-    
-    print(f"Training set size: {len(train_dataset)}")
-    print(f"Validation set size: {len(val_dataset)}")
 
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
     val_loader = DataLoader(val_dataset, batch_size=args.batch_size, shuffle=False)
 
-    print(train_loader)
-
     return train_loader, val_loader
 
-
-def train_one_epoch(model, train_loader, criterion, optimizer, device):
-    model.train()
-    training_loss = 0.0
-
-    for images, masks in tqdm(train_loader, desc="Training"):
-        images, masks = images.to(device), masks.to(device)
-        
-        optimizer.zero_grad()
-        outputs = model(images)
-        loss = criterion(outputs, masks)
-        loss.backward()
-        optimizer.step()
-        
-        training_loss += loss.item() * images.size(0)
-    
-    training_loss = training_loss / len(train_loader.dataset)
-    return training_loss
-
-
-def validate(model, valid_loader, criterion, device):
-    model.eval()
-    val_loss = 0.0
-
-    with torch.no_grad():
-        for images, masks in tqdm(valid_loader, desc="Validation"):
-            images, masks = images.to(device), masks.to(device)
-            
-            outputs = model(images)
-            loss = criterion(outputs, masks)
-            
-            val_loss += loss.item() * images.size(0)
-    
-    val_loss = val_loss / len(valid_loader.dataset)
-    return val_loss
-
-
-# def training(args, train_loader, valid_loader, criterion, optimizer, model, device):
-#     early_stopping = args.early_stopping
-#     current_time = datetime.now().strftime("%Y_%m_%d-%H_%M%_S")
-#     log_file = initialize_training_env(args)
-#     initialize_metrics_file(log_file)
-
-#     model.to(device)
-#     best_val_loss = float('inf')
-
-#     for epoch in range(args.epochs):
-#         print(f"Epoch {epoch+1}/{args.epochs}")
-#         training_loss = train_one_epoch(model, train_loader, criterion, optimizer, device)
-#         val_loss = validate(model, valid_loader, criterion, device)
-        
-#         if val_loss < best_val_loss:
-#             best_val_loss = val_loss
-#             no_improvement = 0
-#         else:
-#             no_improvement += 1
-        
-#         if no_improvement > early_stopping:
-#             print(f"Early stopping at epoch {epoch+1}")
-#             break
-        
-#         log_metrics(log_file, epoch+1, training_loss, val_loss)
-    
-#     final_model_file = os.path.join(args.model_dir, f"model_{current_time}.pth")
-#     save_model(model, args.epoch, final_model_file)
-#     print("Training complete!")
 
 def training(args, train_loader, valid_loader, criterion, optimizer, metrics, model, device):
     early_stopping = args.early_stopping
     current_time = datetime.now().strftime("%Y_%m_%d-%H_%M%_S")
     log_file = initialize_training_env(args)
-    initialize_metrics_file(log_file)
+    initialize_train_log_file(log_file)
 
     train_epoch = smp.utils.train.TrainEpoch(
         model, 
@@ -169,24 +99,21 @@ def training(args, train_loader, valid_loader, criterion, optimizer, metrics, mo
             print(f"Early stopping at epoch {epoch+1}")
             break
         
-        log_metrics(log_file, epoch+1, train_logs['iou_score'], valid_logs['iou_score'])
+        with open(log_file, 'a') as f:
+            f.write(f"{epoch+1,}\t{train_logs['dice_loss']:.6f}\t{train_logs['iou_score']:.6f}\t{valid_logs['dice_loss']:.6f}\t{valid_logs['iou_score']:.6f}\n")
     
-    final_model_file = os.path.join(args.model_dir, f"model_{current_time}.pth")
-    save_model(model, args.epoch, final_model_file)
+    final_model_file = os.path.join(args.model_dir, f"model_{args.single_label}_{current_time}.pth")
+    save_model(model, final_model_file)
     print("Training complete!")
 
 def main():
     args = parse_args()
     train_loader, val_loader = load_dataset(args)
 
-    # model = UNet(n_channels=3, n_classes=args.nclasses).to(device)
-    # criterion = nn.CrossEntropyLoss()
-    # params = [p for p in model.parameters() if p.requires_grad]
-    # optimizer = torch.optim.Adam(params, lr=args.lr, weight_decay=args.weight_decay)
-    
     model = smp.Unet(
         encoder_name=args.encoder, 
         encoder_weights=args.encoder_weights, 
+        in_channels=1,
         classes=len(args.label_list), 
         activation=args.activation,
     )

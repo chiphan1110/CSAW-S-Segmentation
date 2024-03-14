@@ -27,6 +27,7 @@ MODEL_DIR = os.path.join(OUTPUT_DIR, "models/")
 LOG_DIR = os.path.join(OUTPUT_DIR, "logs/")
 PRED_DIR = os.path.join(OUTPUT_DIR, "predictions/")
 
+BEST_MODEL_DIR = os.path.join(MODEL_DIR, "model_nipple_2024_03_14-19_0457.pth")
 # Data Preprocessing and Augmentation 
 IMG_SIZE = 1024  
 CLAHE_FLAG = True
@@ -38,17 +39,18 @@ TRANSFORM = transforms.Compose([
 ])
 
 # Dataset Params
-# CLASSES = ["pectoral_muscle", "nipple"]
-CLASSES = ["nipple"]
+CLASSES = ["pectoral_muscle", "nipple"]
+SINGLE_LABEL = "nipple"
+# CLASSES = ["nipple"]
 NB_CLASSES = len(CLASSES)
 VAL_FRACTION = 0.2
 
 # Training Params
-N_EPOCHS = 5
-BATCH_SIZE = 2
+N_EPOCHS = 50
+BATCH_SIZE = 4
 LEARNING_RATE = 1e-3
-EARLY_STOPPING = 10
-WEIGHT_DECAY = 1e-4
+EARLY_STOPPING = 50
+WEIGHT_DECAY = 1e-8
 
 UNET_ENCODER = 'resnet34'
 UNET_ENCODER_WEIGHTS = 'imagenet'

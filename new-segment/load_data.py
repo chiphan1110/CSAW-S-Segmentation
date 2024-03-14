@@ -6,10 +6,11 @@ from config import *
 
 
 class CSAWS(Dataset):
-    def __init__(self, root_dir, label_list, transform=None):
+    def __init__(self, root_dir, label_list, single_label, transform=None):
         self.root_dir = root_dir
         self.transform = transform
         self.label_list = label_list
+        self.single_label = single_label
 
         self.img_dir = os.path.join(root_dir, 'img')
         self.img_paths = [os.path.join(self.img_dir, filename) for filename in sorted(os.listdir(self.img_dir))]
@@ -36,18 +37,21 @@ class CSAWS(Dataset):
             masks = {label: self.transform(masks[label]) for label in self.label_list}
         
         
-        return image, masks
+        return image, masks[self.single_label]
 
 
 if __name__ == "__main__":
     # Example usage
     # label_list = ['nipple', 'pectoral_muscle']
     label_list = ['nipple', 'pectoral_muscle']
+    single_label = 'nipple'
+    path = "/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/CSAWS_preprocessed/test"
     transforms = transforms.Compose([transforms.Resize((256, 256)), transforms.ToTensor()])
-    dataset = CSAWS('/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/CSAWS_preprocessed', label_list, transform=transforms)
+    dataset = CSAWS(path, label_list, single_label, transform=transforms)
     data_loader = DataLoader(dataset, batch_size=4, shuffle=True)
 
     for data in data_loader:
         images, masks = data[0], data[1]
-        print(images.shape)  
-        print(masks[label_list[1]].shape, masks[label_list[1]].shape)  
+        print(images.shape)   #torch.Size([4, 1, 256, 256])
+        print(masks.shape)    #torch.Size([4, 1, 256, 256])
+        print(masks.type)
