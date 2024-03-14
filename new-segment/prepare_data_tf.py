@@ -9,8 +9,8 @@ import logging
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
-DATA_PATH = "/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/anonymized_dataset/"
-SAVE_PATH = "/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/CSAWS_preprocessed/"
+DATA_PATH = "/home/vishc1/chi/CSAW-S-Segmentation/CSAWS_Sample/anonymized_dataset/"
+SAVE_PATH = "/home/vishc1/chi/CSAW-S-Segmentation/CSAWS_Sample/CSAWS_preprocessed/"
 IMG_SIZE = 1024
 CLASSES = ["_pectoral_muscle", "_nipple"]
 CLAHE_FLAG = True

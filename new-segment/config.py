@@ -8,10 +8,10 @@ HISTORY_PATH = "/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/output/h
 
 
 # Samle path
-ORIGINAL_IMG_PATH = "/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/original_images/"
-MASK_PATH = "/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/anonymized_dataset/"
-SAVE_IMG_PATH = "/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/CSAWS_preprocessed/img/"
-SAVE_MASK_PATH = "/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/CSAWS_preprocessed/mask/"
+ORIGINAL_IMG_PATH = "/home/vishc1/chi/CSAW-S-Segmentation/CSAWS_Sample/original_images/"
+MASK_PATH = "/home/vishc1/chi/CSAW-S-Segmentation/CSAWS_Sample/anonymized_dataset/"
+SAVE_IMG_PATH = "/home/vishc1/chi/CSAW-S-Segmentation/CSAWS_Sample/CSAWS_preprocessed/img/"
+SAVE_MASK_PATH = "/home/vishc1/chi/CSAW-S-Segmentation/CSAWS_Sample/CSAWS_preprocessed/mask/"
 CLASSES = ["pectoral_muscle", "nipple"]
 
 
