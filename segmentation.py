@@ -27,18 +27,13 @@ def parse_arguments():
     return parser.parse_args()
 
 def main(args):
-    # get parameters
     parameters = load_params(args)
     dataset_params = parameters['dataset_params']
     if args.data_location is not None:
         dataset_params['data_location'] = args.data_location    
     dataloader_params = parameters['dataloader_params']
     if dataset_params['dataset_location'] == 'CsawS':
-        DataSet = CsawSet
-    # elif dataset_params['dataset_location'] == 'Cityscapes':
-    #     DataSet = CityScapes
-    # elif dataset_params['dataset_location'] == 'VOC':
-    #     DataSet = PascalVOC                 
+        DataSet = CsawSet          
     else:
         raise ImportError("Dataset not found")
         

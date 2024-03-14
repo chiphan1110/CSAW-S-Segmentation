@@ -13,12 +13,17 @@ from config import *
 
 
 def parse_args():
-
+    ENCODER = 'se_resnext50_32x4d'
+    ENCODER_WEIGHTS = 'imagenet'
+    CLASSES = ['car']
+    ACTIVATION = 'sigmoid' # could be None for logits or 'softmax2d' for multiclass segmentation
+    DEVICE = 'cuda'
     return args
 
 
 def load_dataset(args):
-    full_dataset = MammogramDataset(args.data_path, args.mask_path)
+    full_dataset = MammogramDataset(args.data_path, args.mask_path, augmentation=get_training_augmentation(), 
+)
     train_dataset, val_dataset = train_test_split(full_dataset, test_size=args.val_fraction, random_state=42)
     
     train_loader = DataLoader(train_dataset, batch_size=args.batch_size, shuffle=True)
@@ -54,7 +59,6 @@ def training(args, train_loader, valid_loader, criterion, optimizer, model, devi
         train_logs = train_epoch.run(train_loader)
         valid_logs = valid_epoch.run(valid_loader)
         
-        # do something (save model, change lr, etc.)
         if max_score < valid_logs['iou_score']:
             max_score = valid_logs['iou_score']
             torch.save(model, './best_model.pth')
@@ -67,7 +71,6 @@ def training(args, train_loader, valid_loader, criterion, optimizer, model, devi
 def main():
     args = parse_args()
     train_loader, val_loader = load_datasets(args)
-    criterion = smp.utils.losses.DiceLoss()
 
     model = smp.FPN(
         encoder_name=ENCODER, 
@@ -75,6 +78,13 @@ def main():
         classes=len(CLASSES), 
         activation=ACTIVATION,
     )
+    
+    preprocessing_fn = smp.encoders.get_preprocessing_fn(ENCODER, ENCODER_WEIGHTS)
+
+    criterion = smp.utils.losses.DiceLoss()
+    metrics = [
+    smp.utils.metrics.IoU(threshold=0.5),
+]
 
     params = [p for p in model.parameters() if p.requires_grad]
     optimizer = torch.optim.Adam(params, lr=args.lr, weight_decay=args.weight_decay)
@@ -83,75 +93,5 @@ def main():
     training(args, train_loader, val_loader, criterion, optimizer, model, device)
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    os.environ["CUDA_VISIBLE_DEVICES"] = CUDA_VISIBLE_DEVICES
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    train_loader, val_loader = prepare_datasets(DATA_PATH, MASK_PATH, TRAIN_VAL_SPLIT)
-
-    model = UNet(n_channels=3, n_classes=NB_CLASSES).to(device)  
-
-    # Define the optimizer and loss function
-    optimizer = optim.Adam(model.parameters(), lr=LEARNING_RATE)
-    criterion = nn.CrossEntropyLoss()  # Adjust based on your loss function
-    metrics = [smp.utils.metrics.IoU(threshold=0.5),]
-    num_epochs = N_EPOCHS  # Set the number of epochs
-
-    for epoch in range(num_epochs):
-        # Training Phase
-        model.train()
-        train_loss = 0.0
-        for images, masks in train_loader:
-            images, masks = images.to(device), masks.to(device)
-            
-            optimizer.zero_grad()
-            outputs = model(images)
-            loss = criterion(outputs, masks)
-            loss.backward()
-            optimizer.step()
-            
-            train_loss += loss.item() * images.size(0)
-        
-        # Validation Phase
-        model.eval()  # Set the model to evaluation mode
-        val_loss = 0.0
-        with torch.no_grad():  # Turn off gradients for validation
-            for images, masks in val_loader:
-                images, masks = images.to(device), masks.to(device)
-                
-                outputs = model(images)
-                loss = criterion(outputs, masks)
-                
-                val_loss += loss.item() * images.size(0)
-        
-        # Calculate average losses
-        train_loss = train_loss / len(train_loader.dataset)
-        val_loss = val_loss / len(val_loader.dataset)
-        
-        # Print training and validation loss
-        print(f'Epoch {epoch+1}/{num_epochs}, Training Loss: {train_loss:.4f}, Validation Loss: {val_loss:.4f}')
-
-    torch.save(model.state_dict(), os.path.join(SAVE_PATH, "unet_model.pth"))
 if __name__ == "__main__":
     main()
