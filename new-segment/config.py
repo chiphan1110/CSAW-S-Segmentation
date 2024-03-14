@@ -5,17 +5,17 @@ import torchvision.transforms as transforms
 CUDA_VISIBLE_DEVICES = "0"
 
 # Path
-ROOT = "/home/phanthc/Chi/Code/CSAW-S-Segmentation/CSAWS_Sample/"
+ROOT = "/home/vishc1/hoang/CSAW-S/"
+RAW_DATA = os.path.join(ROOT, "CsawS/")
 DATASET_PATH = os.path.join(ROOT, "CSAWS_preprocessed/")
 
-# Sample path
-SAMPLE_TRAIN_ORIGINAL_IMG_PATH = os.path.join(ROOT, "original_images/")
-SAMPLE_TRAIN_ORIGINAL_MASK_PATH = os.path.join(ROOT, "anonymized_dataset/")
+TRAIN_ORIGINAL_IMG_PATH = os.path.join(RAW_DATA, "original_images/")
+TRAIN_ORIGINAL_MASK_PATH = os.path.join(RAW_DATA, "anonymized_dataset/")
 SAVE_TRAIN_PATH = os.path.join(DATASET_PATH, "train/")
 SAVE_TRAIN_IMG_PATH = os.path.join(SAVE_TRAIN_PATH, "img/")
 SAVE_TRAIN_MASK_PATH = os.path.join(SAVE_TRAIN_PATH, "mask/")
 
-TEST_ORIGINAL_PATH = os.path.join(ROOT, "test_data/")
+TEST_ORIGINAL_PATH = os.path.join(RAW_DATA, "test_data/")
 TEST_ORIGINAL_IMG_PATH = os.path.join(TEST_ORIGINAL_PATH, "anonymized_dataset/")
 TEST_ORIGINAL_MASK_PATH = os.path.join(TEST_ORIGINAL_PATH, "annotator_1")
 SAVE_TEST_PATH = os.path.join(DATASET_PATH, "test/")
@@ -27,7 +27,8 @@ MODEL_DIR = os.path.join(OUTPUT_DIR, "models/")
 LOG_DIR = os.path.join(OUTPUT_DIR, "logs/")
 PRED_DIR = os.path.join(OUTPUT_DIR, "predictions/")
 
-BEST_MODEL_DIR = os.path.join(MODEL_DIR, "model_nipple_2024_03_14-19_0457.pth")
+# BEST_MODEL_DIR = os.path.join(MODEL_DIR, "model_nipple_2024_03_14-19_0457.pth")
+
 # Data Preprocessing and Augmentation 
 IMG_SIZE = 1024  
 CLAHE_FLAG = True
@@ -41,7 +42,6 @@ TRANSFORM = transforms.Compose([
 # Dataset Params
 CLASSES = ["pectoral_muscle", "nipple"]
 SINGLE_LABEL = "nipple"
-# CLASSES = ["nipple"]
 NB_CLASSES = len(CLASSES)
 VAL_FRACTION = 0.2
 

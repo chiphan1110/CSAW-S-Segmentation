@@ -11,8 +11,8 @@ logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(
 
 def parse_args():
     parser = argparse.ArgumentParser(description="Prepare dataset")
-    parser.add_argument("--original_train_img_path", type=str, default=SAMPLE_TRAIN_ORIGINAL_IMG_PATH, help="Path to the original images")
-    parser.add_argument("--original_train_mask_path", type=str, default=SAMPLE_TRAIN_ORIGINAL_MASK_PATH, help="Path to the masks")
+    parser.add_argument("--original_train_img_path", type=str, default=TRAIN_ORIGINAL_IMG_PATH, help="Path to the original images")
+    parser.add_argument("--original_train_mask_path", type=str, default=TRAIN_ORIGINAL_MASK_PATH, help="Path to the masks")
     parser.add_argument("--processed_train_img_path", type=str, default=SAVE_TRAIN_IMG_PATH, help="Path to save the preprocessed train images")
     parser.add_argument("--processed_train_mask_path", type=str, default=SAVE_TRAIN_MASK_PATH, help="Path to save the preprocessed train masks")
     
